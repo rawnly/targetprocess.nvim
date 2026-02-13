@@ -1,0 +1,2 @@
+-- This file is intentionally empty.
+-- Call require("targetprocess").setup({...}) from your config.

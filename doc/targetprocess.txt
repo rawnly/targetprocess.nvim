@@ -1,0 +1,115 @@
+*targetprocess.txt*  View TargetProcess user stories in Neovim
+
+Author:   Federico Vitale
+License:  MIT
+
+==============================================================================
+CONTENTS                                          *targetprocess-contents*
+
+  1. Introduction ............................ |targetprocess-introduction|
+  2. Requirements ............................ |targetprocess-requirements|
+  3. Setup ................................... |targetprocess-setup|
+  4. Commands ................................ |targetprocess-commands|
+  5. Branch Detection ........................ |targetprocess-branch|
+  6. Lua API ................................. |targetprocess-api|
+
+==============================================================================
+1. INTRODUCTION                                *targetprocess-introduction*
+
+targetprocess.nvim is a plugin to view TargetProcess user stories directly
+from Neovim. It automatically detects the ticket ID from the current git
+branch and displays the story in a floating window.
+
+==============================================================================
+2. REQUIREMENTS                                *targetprocess-requirements*
+
+- Neovim >= 0.10
+- `curl` available in $PATH
+- A TargetProcess account with an API access token
+
+==============================================================================
+3. SETUP                                              *targetprocess-setup*
+
+Call the setup function with your TargetProcess instance URL and API token: >lua
+
+    require("targetprocess").setup({
+        base_url = "https://yourcompany.tpondemand.com",
+        token = vim.env.TARGET_PROCESS_ACCESS_TOKEN,
+    })
+<
+                                                *targetprocess.setup()*
+setup({opts})
+    Configure the plugin and register commands.
+
+    Parameters: ~
+        {opts}  (table)  Configuration options:
+            - {base_url}  (string)  TargetProcess instance URL.
+                          Example: "https://yourcompany.tpondemand.com"
+            - {token}     (string)  API access token.
+
+    Both fields are required. The plugin will show an error if either is
+    missing.
+
+==============================================================================
+4. COMMANDS                                        *targetprocess-commands*
+
+                                                      *:TargetProcessView*
+:TargetProcessView [id]
+    Fetch a user story from TargetProcess and display it in a centered
+    floating window. The window shows the title and description formatted
+    as markdown.
+
+    When [id] is omitted, the ticket ID is extracted from the current git
+    branch (see |targetprocess-branch|).
+
+    [id] can be a numeric ID (e.g. `12345`) or a TargetProcess entity URL
+    (e.g. `https://company.tpondemand.com/entity/12345-story-name`).
+
+    The floating window can be closed with `q` or `<Esc>`.
+
+                                                      *:TargetProcessOpen*
+:TargetProcessOpen [id]
+    Open the user story in your default web browser.
+
+    When [id] is omitted, the ticket ID is extracted from the current git
+    branch (see |targetprocess-branch|).
+
+    Uses |vim.ui.open()| to launch the browser.
+
+==============================================================================
+5. BRANCH DETECTION                                *targetprocess-branch*
+
+The plugin extracts the ticket ID from the current git branch name. The
+following patterns are checked in order:
+
+  1. `prefix/ID_description`
+     Matches branches like `feature/12345_add_login_page`.
+     The numeric part after the `/` and before the `_` is used as the ID.
+
+  2. Any sequence of 4 or more digits.
+     Fallback pattern that matches any long numeric sequence found
+     anywhere in the branch name.
+
+If no ID can be extracted, the commands will show a warning.
+
+==============================================================================
+6. LUA API                                            *targetprocess-api*
+
+                                                *targetprocess.view()*
+targetprocess.view({id_or_url})
+    Fetch and display a user story in a floating window.
+
+    Parameters: ~
+        {id_or_url}  (string|nil)  Ticket ID, TP URL, or nil to detect
+                                    from branch.
+
+                                                *targetprocess.open()*
+targetprocess.open({id_or_url})
+    Open a user story in the browser.
+
+    Parameters: ~
+        {id_or_url}  (string|nil)  Ticket ID, TP URL, or nil to detect
+                                    from branch.
+
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
