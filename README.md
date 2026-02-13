@@ -61,6 +61,9 @@ The plugin extracts the ticket ID from branch names matching these patterns
 | `q` | Close the floating window |
 | `<Esc>` | Close the floating window |
 
+## See Also 
+- [gh-targetprocess](https://github.com/rawnly/gh-targetprocess) - A github CLI extension to create a pull-request starting from a TP-ID 
+
 ## License
 
 MIT
